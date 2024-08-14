@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>散布圖與回歸分析</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.6.0/math.min.js"></script>
+</head>
+<body>
+    <h1>散布圖與回歸分析</h1>
+    
+    <div>
+        <label for="x-values">輸入X軸數據 (逗號分隔):</label>
+        <input type="text" id="x-values" placeholder="例如: 1, 2, 3">
+    </div>
+    <div>
+        <label for="y-values">輸入Y軸數據 (逗號分隔):</label>
+        <input type="text" id="y-values" placeholder="例如: 2, 4, 6">
+    </div>
+    <button onclick="generatePlot()">產生散布圖</button>
+
+    <canvas id="scatterPlot" width="400" height="400"></canvas>
+    
+    <h2>回歸方程式</h2>
+    <p id="equation"></p>
+    <p id="r2"></p>
+
+    <script>
+        function generatePlot() {
+            // 獲取輸入的數據
+            const xValues = document.getElementById('x-values').value.split(',').map(Number);
+            const yValues = document.getElementById('y-values').value.split(',').map(Number);
+
+            if (xValues.length !== yValues.length || xValues.length === 0) {
+                alert('請確保X和Y數據有相同的組數並且不為空！');
+                return;
+            }
+
+            // 使用math.js計算回歸
+            const n = xValues.length;
+            const sumX = math.sum(xValues);
+            const sumY = math.sum(yValues);
+            const sumXY = math.sum(xValues.map((x, i) => x * yValues[i]));
+            const sumXX = math.sum(xValues.map(x => x * x));
+
+            const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+
+            const yPredicted = xValues.map(x => slope * x + intercept);
+            const ssTotal = math.sum(yValues.map(y => Math.pow(y - math.mean(yValues), 2)));
+            const ssResidual = math.sum(yValues.map((y, i) => Math.pow(y - yPredicted[i], 2)));
+            const rSquared = 1 - ssResidual / ssTotal;
+
+            // 顯示方程式和R^2
+            document.getElementById('equation').innerText = `回歸方程式: y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}`;
+            document.getElementById('r2').innerText = `R² = ${rSquared.toFixed(2)}`;
+
+            // 繪製散布圖和回歸線
+            const ctx = document.getElementById('scatterPlot').getContext('2d');
+            const scatterData = {
+                datasets: [{
+                    label: '散布圖',
+                    data: xValues.map((x, i) => ({x: x, y: yValues[i]})),
+                    backgroundColor: 'rgba(75, 192, 192, 1)',
+                }, {
+                    label: '回歸線',
+                    data: [{x: Math.min(...xValues), y: Math.min(...yPredicted)}, {x: Math.max(...xValues), y: Math.max(...yPredicted)}],
+                    type: 'line',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false,
+                }]
+            };
+
+            new Chart(ctx, {
+                type: 'scatter',
+                data: scatterData,
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
