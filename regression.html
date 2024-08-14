@@ -16,11 +16,9 @@
         }
 
         #scatterPlot {
-            margin-top: 20px;
-            /* 使用內聯樣式設置寬度和高度 */
-            width: 566px; 
+            width: 566px;
             height: 566px;
-            border: 1px solid #000; /* 添加一個邊框 */
+            border: 1px solid #000; /* 添加邊框 */
         }
 
         button {
@@ -42,7 +40,7 @@
         </div>
         <button onclick="generatePlot()">產生散布圖</button>
 
-        <!-- 這裡是修改後的 canvas 標籤 -->
+        <!-- 確保canvas的寬度和高度是固定的 -->
         <canvas id="scatterPlot" width="566" height="566" style="border:1px solid #000000;"></canvas>
         
         <h2>回歸方程式</h2>
@@ -77,25 +75,19 @@
             document.getElementById('equation').innerText = `回歸方程式: y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}`;
             document.getElementById('r2').innerText = `R² = ${rSquared.toFixed(2)}`;
 
+            // 清除之前繪製的圖表
             const ctx = document.getElementById('scatterPlot').getContext('2d');
-            const scatterData = {
-                datasets: [{
-                    label: '散布圖',
-                    data: xValues.map((x, i) => ({x: x, y: yValues[i]})),
-                    backgroundColor: 'rgba(75, 192, 192, 1)',
-                }, {
-                    label: '回歸線',
-                    data: [{x: Math.min(...xValues), y: Math.min(...yPredicted)}, {x: Math.max(...xValues), y: Math.max(...yPredicted)}],
-                    type: 'line',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    fill: false,
-                }]
-            };
+            if (window.scatterChart) {
+                window.scatterChart.destroy(); // 銷毀之前的圖表實例
+            }
 
-            new Chart(ctx, {
+            // 創建新的散布圖
+            window.scatterChart = new Chart(ctx, {
                 type: 'scatter',
                 data: scatterData,
                 options: {
+                    responsive: false, // 禁用自適應
+                    maintainAspectRatio: false, // 禁止維持寬高比
                     scales: {
                         x: {
                             type: 'linear',
