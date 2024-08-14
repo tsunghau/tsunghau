@@ -17,9 +17,10 @@
 
         #scatterPlot {
             margin-top: 20px;
-            border: 1px solid #000; /* 加一個邊框以便查看邊界 */
-            width: 566px; /* 15cm 寬 */
-            height: 566px; /* 15cm 高 */
+            /* 使用內聯樣式設置寬度和高度 */
+            width: 566px; 
+            height: 566px;
+            border: 1px solid #000; /* 添加一個邊框 */
         }
 
         button {
@@ -41,7 +42,8 @@
         </div>
         <button onclick="generatePlot()">產生散布圖</button>
 
-        <canvas id="scatterPlot"></canvas>
+        <!-- 這裡是修改後的 canvas 標籤 -->
+        <canvas id="scatterPlot" width="566" height="566" style="border:1px solid #000000;"></canvas>
         
         <h2>回歸方程式</h2>
         <p id="equation"></p>
