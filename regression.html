@@ -16,8 +16,6 @@
         }
 
         #scatterPlot {
-            width: 566px;
-            height: 566px;
             border: 1px solid #000; /* 添加邊框 */
         }
 
@@ -40,8 +38,8 @@
         </div>
         <button onclick="generatePlot()">產生散布圖</button>
 
-        <!-- 確保canvas的寬度和高度是固定的 -->
-        <canvas id="scatterPlot" width="566" height="566" style="border:1px solid #000000;"></canvas>
+        <!-- 直接使用 canvas 標籤的 width 和 height 屬性 -->
+        <canvas id="scatterPlot" width="400" height="400" style="border:1px solid #000000;"></canvas>
         
         <h2>回歸方程式</h2>
         <p id="equation"></p>
@@ -75,19 +73,35 @@
             document.getElementById('equation').innerText = `回歸方程式: y = ${slope.toFixed(2)}x + ${intercept.toFixed(2)}`;
             document.getElementById('r2').innerText = `R² = ${rSquared.toFixed(2)}`;
 
-            // 清除之前繪製的圖表
             const ctx = document.getElementById('scatterPlot').getContext('2d');
+
+            // 構建數據集
+            const scatterData = {
+                datasets: [{
+                    label: '散布圖',
+                    data: xValues.map((x, i) => ({x: x, y: yValues[i]})),
+                    backgroundColor: 'rgba(75, 192, 192, 1)',
+                }, {
+                    label: '回歸線',
+                    data: [{x: Math.min(...xValues), y: Math.min(...yPredicted)}, {x: Math.max(...xValues), y: Math.max(...yPredicted)}],
+                    type: 'line',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    fill: false,
+                }]
+            };
+
+            // 如果已經有一個圖表，先銷毀它
             if (window.scatterChart) {
-                window.scatterChart.destroy(); // 銷毀之前的圖表實例
+                window.scatterChart.destroy();
             }
 
-            // 創建新的散布圖
+            // 創建並顯示新圖表
             window.scatterChart = new Chart(ctx, {
                 type: 'scatter',
                 data: scatterData,
                 options: {
-                    responsive: false, // 禁用自適應
-                    maintainAspectRatio: false, // 禁止維持寬高比
+                    responsive: false, // 禁用自適應行為
+                    maintainAspectRatio: false, // 禁用寬高比
                     scales: {
                         x: {
                             type: 'linear',
